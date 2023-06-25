@@ -1,0 +1,87 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+$penalty_amount = null;
+
+if (isset($_GET['edit_penalty_id'])) {
+    $penalty_id = $_GET['edit_penalty_id'];
+
+    $select_query = "SELECT penalty_amount, recent_update FROM penalties WHERE penalty_id = :penalty_id";
+    $stmt = $pdo->prepare($select_query);
+    $stmt->bindParam(':penalty_id', $penalty_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $penalty = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($penalty) {
+        $penalty_amount = $penalty['penalty_amount'];
+        $recent_update = $penalty['recent_update'];
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['penalty_id']) && isset($_POST['penalty_amount']) && isset($_POST['recent_update'])) {
+            $penalty_id = $_POST['penalty_id'];
+            $new_penalty_amount = $_POST['penalty_amount'];
+            $new_recent_update = $_POST['recent_update'];
+
+            $update_query = "UPDATE penalties SET penalty_amount = :new_penalty_amount, recent_update = :new_recent_update WHERE penalty_id = :penalty_id";
+            $stmt = $pdo->prepare($update_query);
+            $stmt->bindParam(':new_penalty_amount', $new_penalty_amount, PDO::PARAM_STR);
+            $stmt->bindParam(':new_recent_update', $new_recent_update, PDO::PARAM_STR);
+            $stmt->bindParam(':penalty_id', $penalty_id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            echo "<p>Data updated successfully!</p>";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Data</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="update_form.css">
+</head>
+<body>
+<div class="main">
+    <div class="add">
+        <a class="add-button" href="view_penalty.php">View List</a>
+    </div>
+    <div class="nav-container">
+        <div class="nav">
+            <div class="up">
+                <h1>Update Penalty</h1>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <form method="POST" action="">
+            <input type="hidden" name="penalty_id" value="<?php echo htmlspecialchars($penalty_id); ?>">
+
+            Penalty Amount:
+            <br>
+            <input type="text" name="penalty_amount" value="<?php echo htmlspecialchars($penalty_amount); ?>"><br><br>
+
+            Date:
+            <br>
+            <input type="date" name="recent_update" value="<?php echo htmlspecialchars($recent_update); ?>"><br><br>
+
+            <input class="submit-button" type="submit" name="update" value="Save data">
+        </form>
+    </div>
+</div>
+</body>
+</html>

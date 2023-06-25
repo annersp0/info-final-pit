@@ -1,0 +1,35 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if (isset($_GET['book_id'])) {
+    $book_id = $_GET['book_id'];
+
+    $delete_borrowed_books_query = "DELETE FROM borrowed_books WHERE book_id = :book_id";
+    $stmt = $pdo->prepare($delete_borrowed_books_query);
+    $stmt->bindParam(':book_id', $book_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $delete_genre_query = "DELETE FROM genres WHERE book_id = :book_id";
+    $stmt = $pdo->prepare($delete_genre_query);
+    $stmt->bindParam(':book_id', $book_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $delete_query = "DELETE FROM books WHERE book_id = :book_id";
+    $stmt = $pdo->prepare($delete_query);
+    $stmt->bindParam(':book_id', $book_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    header("Location: view_books.php");
+    exit();
+}
+?>

@@ -1,0 +1,123 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #ecf8f9e4;
+}
+
+.main {
+    width: 95%;
+    height: 653px;
+    margin-left: 28px;
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+
+.add {
+    display: flex;
+    float: right;
+    width: 20%;
+    height: 50px;
+    justify-content: right;
+}
+
+.add-button {
+    background-color: #8a3b3b;
+    border-radius: 10px;
+    width: 125px;
+    height: 30px;
+    transition: .3s;
+}
+
+.add-button:hover {
+    background-color: #52504f;
+}
+
+.add a {
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    padding-top: 15px;
+    FONT-SIZE: 15px;
+    letter-spacing: 2px;
+}
+
+.nav-container {
+    background-color: #068DA9;
+    width: 95%;
+    height: 120px;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 55px;
+    border-radius: 6px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 50%;
+    height: 50px;
+    margin-left: 20px;
+}
+
+.up h1 {
+    color: white;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-left: 20px;
+}
+
+.down {
+    padding-left: 20px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+    width: 100%;
+}
+
+.down a {
+    text-decoration: none;
+    font-size: 18px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: rgb(54, 54, 54);
+}
+
+.down:hover {
+    color: #8a3b3ba1;
+    text-decoration: underline;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    top: 20.5%;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0;
+}
+
+.content-table {
+    color: tomato;
+}
+
+thead {
+    font-size: 20px;
+}
+
+td {
+    box-sizing: border-box;
+    background-color: antiquewhite;
+    text-align: center;
+    padding: 10px 10px;
+    color: black;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.actions a {
+    padding: 5px 5px;
+    text-decoration: none;
+}

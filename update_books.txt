@@ -1,0 +1,119 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if (isset($_GET['edit_book_id'])) {
+    $edit_book_id = $_GET['edit_book_id'];
+
+    $query = "SELECT books.*, genres.genre FROM books LEFT JOIN genres ON books.book_id = genres.book_id WHERE books.book_id = :edit_book_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':edit_book_id', $edit_book_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $book_id = $row['book_id'];
+        $title = $row['title'];
+        $author = $row['author'];
+        $pub_year = $row['pub_year'];
+        $book_qty = $row['book_qty'];
+        $genre = $row['genre'];
+    } else {
+    }
+}
+
+if (isset($_POST['update'])) {
+    $new_title = $_POST['title'];
+    $new_author = $_POST['author'];
+    $new_pub_year = $_POST['pub_year'];
+    $new_genre = $_POST['genre'];
+    $new_book_qty = $_POST['book_qty'];
+
+    $update_query = "UPDATE books SET title = :new_title, author = :new_author, pub_year = :new_pub_year, book_qty = :new_book_qty WHERE book_id = :edit_book_id";
+    $stmt = $pdo->prepare($update_query);
+    $stmt->bindParam(':new_title', $new_title, PDO::PARAM_STR);
+    $stmt->bindParam(':new_author', $new_author, PDO::PARAM_STR);
+    $stmt->bindParam(':new_pub_year', $new_pub_year, PDO::PARAM_STR);
+    $stmt->bindParam(':new_book_qty', $new_book_qty, PDO::PARAM_INT);
+    $stmt->bindParam(':edit_book_id', $edit_book_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $update_genre_query = "UPDATE genres SET genre = :new_genre WHERE book_id = :edit_book_id";
+    $stmt = $pdo->prepare($update_genre_query);
+    $stmt->bindParam(':new_genre', $new_genre, PDO::PARAM_STR);
+    $stmt->bindParam(':edit_book_id', $edit_book_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    echo "<p>Data updated successfully!</p>";
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Data</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="update_form.css">
+</head>
+<body>
+<div class="main">
+    <div class="add">
+        <a class="add-button" href="view_books.php">View List</a>
+    </div>
+    <div class="nav-container">
+        <div class="nav">
+            <div class="up">
+                <h1>Update Book Details</h1>
+            </div>
+        </div>
+    </div>
+        <div class="content">
+            <form method="POST" action="">
+                <input type="hidden" name="edit_book_id" value="<?php echo $edit_book_id; ?>">
+                
+                Title:
+                <br>
+                <input type="text" name="title" value="<?php echo $title; ?>" required><br><br>
+
+                Author:
+                <br>
+                <input type="text" name="author" value="<?php echo $author; ?>" required><br><br>
+
+                Publication Year:
+                <br>
+                <input type="number" name="pub_year" value="<?php echo $pub_year; ?>" required><br><br>
+
+                Genre:
+                <br>
+                <select name="genre">
+                    <option value="Educational" <?php if ($genre == "Educational") echo "selected"; ?>>Educational</option>
+                    <option value="Fiction" <?php if ($genre == "Fiction") echo "selected"; ?>>Fiction</option>
+                    <option value="Horror" <?php if ($genre == "Horror") echo "selected"; ?>>Horror</option>
+                    <option value="Fantasy" <?php if ($genre == "Fantasy") echo "selected"; ?>>Fantasy</option>
+                    <option value="Mystery" <?php if ($genre == "Mystery") echo "selected"; ?>>Mystery</option>
+                    <option value="Drama" <?php if ($genre == "Drama") echo "selected"; ?>>Drama</option>
+                    <option value="Comedy" <?php if ($genre == "Comedy") echo "selected"; ?>>Comedy</option>
+                    <option value="Romance" <?php if ($genre == "Romance") echo "selected"; ?>>Romance</option>
+                    <option value="Thriller" <?php if ($genre == "Thriller") echo "selected"; ?>>Thriller</option>
+                </select><br><br>
+
+                Quantity:
+                <br>
+                <input type="number" name="book_qty" value="<?php echo $book_qty; ?>" required><br><br><br>
+
+                <input class="submit-button" type="submit" name="update" value="Save data">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

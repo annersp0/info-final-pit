@@ -1,0 +1,92 @@
+INSERT INTO books (title, author, pub_year, book_qty) VALUES 
+('Database System', 'Carlos Coronel', 2015, 15),
+('Computer Networking', 'James Kurose', 2016, 12),
+('Information Management', 'Roger Pressman', 2018, 8),
+('The Kite Runner', 'Khaled Hosseini', 2003, 6),
+('Dracula','Bram Stoker', 1897, 2),
+('The Shining','Stephen King', 1977, 4),
+('Harry Potter', 'J.K. Rowling', 1997, 23),
+('The Maltese Falcon', 'Dashiell Hammet', 1930, 3),
+('And Then There Were None', 'Agtha Christie', 1939, 3),
+('The Girl With The Dragon Tattoo', 'Stieg Larsson', 2005, 10),
+('Gone Girl', 'Gillian Flynn', 2012, 13),
+('The Great Alone', 'Kristin Hannah', 2018, 15),
+('Atonement', 'Ian McEwan', 2001, 5),
+('Bridget Jones Diary', 'Helen Fielding', 1996, 5),
+('Pride and Prejudice', 'Jane Austen', 1813, 2),
+('Outlander','Diana Gabaldon', 1991, 4),
+('The Da Vinci Code', 'Dan Brown', 2003, 18),
+('The Silence of the Lambs', 'Thomas Harris', 1988, 10),
+('The Girl on the Train', 'Paula Hawkins', 2015, 12),
+('The Silent Patient', 'Alex Michaelides', 2019, 15);
+
+INSERT INTO genres (genre, book_id) VALUES 
+('Educational', 32001),
+('Educational', 32002),
+('Educational', 32003),
+('Fiction', 32004),
+('Horror', 32005),
+('Horror', 32006),
+('Fantasy', 32007),
+('Mystery', 32008),
+('Mystery', 32009),
+('Mystery', 32010),
+('Mystery', 32011),
+('Drama', 32012),
+('Drama', 32013),
+('Comedy', 32014),
+('Romance', 32015),
+('Romance', 32016),
+('Thriller', 32017),
+('Thriller', 32018),
+('Thriller', 32019),
+('Thriller', 32020);
+
+INSERT INTO members (first_name, last_name, address, phone, email) VALUES
+('Alfred', 'Futterkiste', 'Obere Str. 57, London', 912209, 'alfred@gmail.com'),
+('Roland', 'Mendel', 'Kirchgasse 6, Austria', 914801, 'roland@gmail.com'),
+('Anne', 'Devon', '35 King George,London', 987996, 'anne@gmail.com'),
+('Janine', 'Torres', '67, Cinquante Otages,France', 944125, 'Jtorres@gmail.com'),
+('Svene', 'Reid', 'Walserweg 21,Germany', 952066, 'reid@gmail.com'),
+('Elizabeth', 'Brown', 'Berkeley Gardens 12,London', 988714, 'lizabrown@gmail.com'),
+('Afonso', 'Pedro', 'Av. dos Lusiadas 23,Swedin', 943204, 'pedrow@gmail.com'),
+('Yang', 'Wang', 'Hauptstr. 29, Switzerland', 930128, 'wangwang@gmail.com'),
+('Francisco', 'Chang', 'Sierras de Granada, Mexico', 905022, 'franschang12@gmail.com'),
+('Patricio', 'Simpson', 'Cerrito 333, Argentina', 910108, 'simpatricio98@gmail.com'),
+('Victoria', 'Ashworth', 'Fauntleroy Circus, UK', 988134, 'victoria1@gmail.com'),
+('Elizabeth', 'Lincoln', '23 Tsawassen Blvd. Canada', 909881, 'linelizabeth@yahoo.com'),
+('Laurence', 'Lebihans', '12, rue des Bouchers, France', 913081, 'laurence12@gmail.com'),
+('Martin', 'Sommer', ' 67 Araquil Madrid, Spain', 928023, 'martsomer@gmail.com'),
+('Frederique', 'Citeaux', '24, place Kleber, Morocco', 902162, 'fred@gmail.com'),
+('Hanna', 'Moos', 'Forsterstr. 57, Germany', 968306, 'mooshan@gmail.com'),
+('Christina', 'Berglund', 'Stockholms 15th, Sweden', 988762, 'tina@hotmail.com'),
+('Thomas', 'Thomson', '120 Hanover Sq., London', 967587, 'thomas@yahoo.com'),
+('Antonio', 'Moreno', 'Mataderos 2312, Mexico', 905023, 'antonio@gmail.com'),
+('Michael', 'Ford', 'Manhattan, USA', 975231, 'michaelford@gmail.com');
+
+INSERT INTO borrowings (member_id, borrowing_date, due_date, return_date, days_late) VALUES
+(20230018, '2022-01-14', '2022-01-21', '2022-01-17' ,0),
+(20230014, '2022-04-08', '2022-04-15', '2022-04-13', 0),
+(20230017, '2022-04-25', '2022-05-02', '2022-05-05', 3),
+(20230001, '2022-05-25', '2022-06-01', '2022-06-03', 2),
+(20230003, '2022-06-05', '2022-06-12', '2022-06-07', 0),
+(20230008, '2022-07-18', '2022-07-25', '2022-07-30', 5),
+(20230005, '2022-09-30', '2022-10-07', '2022-10-06', 0),
+(20230016, '2022-10-10', '2022-10-17', '2022-10-20', 3),
+(20230000, '2022-10-27', '2022-11-03', '2022-11-07', 4),
+(20230003, '2022-11-19', '2022-11-26', '2022-11-30', 4);
+
+INSERT INTO borrowed_books (borrowing_id, book_id, bb_qty) VALUES
+(103000, 32013, 2),
+(103001, 32003, 3),
+(103002, 32007, 3),
+(103003, 32014, 1),
+(103004, 32001, 2),
+(103005, 32015, 1),
+(103006, 32020, 1),
+(103007, 32010, 3),
+(103008, 32017, 2),
+(103009, 32002, 1);
+
+INSERT INTO penalties (penalty_amount, recent_update) VALUES 
+(25, '2022-01-14');

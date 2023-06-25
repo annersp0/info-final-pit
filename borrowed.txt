@@ -1,0 +1,174 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $memberID = $_POST['member_id'];
+    $borrowedDate = $_POST['borrowing_date'];
+    $returnDate = $_POST['return_date'];
+    $daysLate = $_POST['days_late'];
+
+    try {
+        $pdo->beginTransaction();
+
+        $dueDate = "";
+        if ($borrowedDate !== "") {
+            $dueDate = date('Y-m-d', strtotime($borrowedDate . ' + 7 days'));
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO borrowings (member_id, borrowing_date, due_date, return_date, days_late) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$memberID, $borrowedDate, $dueDate, $returnDate, $daysLate]);
+
+        $borrowingID = $pdo->lastInsertId();
+
+        $bookIDs = $_POST['book_id'];
+        $quantities = $_POST['bb_qty'];
+
+        foreach ($bookIDs as $index => $bookID) {
+            $stmt = $pdo->prepare("SELECT * FROM books WHERE book_id = ?");
+            $stmt->execute([$bookID]);
+            $book = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$book) {
+                echo " ";
+                continue;
+            }
+
+            $bookQty = $book['book_qty'];
+
+            $bbQty = $bookQty > 0 ? min($quantities[$index], $bookQty) : 0;
+
+            $stmt = $pdo->prepare("INSERT INTO borrowed_books (book_id, bb_qty, borrowing_id) VALUES (?, ?, ?)");
+            $stmt->execute([$bookID, $bbQty, $borrowingID]);
+        }
+
+
+        $pdo->commit();
+
+        echo "Data saved successfully!";
+    } catch(PDOException $e) {
+        $pdo->rollBack();
+        echo "Error: " . $e->getMessage();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Data</title><br><br>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="form.css">
+    </head>
+<body>
+    <div class="main">
+        <div class="add">
+            <a class="add-button" href="view_borrowed.php">View List</a>       
+        </div>
+        <div class="nav-container">
+            <div class="nav">
+                <div class="up">
+                <h1>Checkout Books</h1>
+            </div>
+                <div class="down">
+                    <a class="view-button" href="book.php">Books</a>
+                    <a class="view-button" href="member.php">Members</a>
+                    <a class="view-button" href="borrowed.php">Borrowings</a>
+                    <a class="view-button" href="penalty.php">Penalty</a>
+                </div>   
+            </div>
+        </div>
+            <div class="content">
+                <form method="POST" action="">
+                    Member:
+                    <br>
+                    <select name="member_id" required>
+                    <option value="">Select a member</option>
+                        <?php
+                        $stmt = $pdo->query("SELECT member_id, CONCAT(first_name, ' ', last_name) AS full_name FROM members");
+                        $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($members as $member) {
+                            echo "<option value='".$member['member_id']."'>".$member['full_name']."</option>";
+                        }
+                        ?>
+                    </select>
+                    <br><br>
+                    Book 1:
+                    <br>
+                    <select name="book_id[]" required>
+                        <option value="">Select a book</option>
+                        <?php
+                        $stmt = $pdo->query("SELECT book_id, title, book_qty FROM books");
+                        $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($books as $book) {
+                            echo "<option value='".$book['book_id']."'>".$book['title']."</option>";
+                        }
+                        ?>
+                    </select>
+                    <br><br>
+
+                    Quantity 1:
+                    <br>
+                    <input type="number" name="bb_qty[]" placeholder="Borrowed book quantity" required max="2"><br><br>
+
+                    Book 2:
+                    <br>
+                    <select name="book_id[]">
+                        <option value="">Select a book</option>
+                        <?php
+                        foreach ($books as $book) {
+                            echo "<option value='".$book['book_id']."'>".$book['title']."</option>";
+                        }
+                        ?>
+                    </select>
+                    <br><br>
+
+                    Quantity 2:
+                    <br>
+                    <input type="number" name="bb_qty[]" placeholder="Borrowed book quantity" max="2"><br><br>
+
+                    Book 3:
+                    <br>
+                    <select name="book_id[]">
+                        <option value="">Select a book</option>
+                        <?php
+                        foreach ($books as $book) {
+                            echo "<option value='".$book['book_id']."'>".$book['title']."</option>";
+                        }
+                        ?>
+                    </select>
+                    <br><br>
+
+                    Quantity 3:
+                    <br>
+                    <input type="number" name="bb_qty[]" placeholder="Borrowed book quantity" max="2">
+                    <br><br>
+
+                    Borrowed Date:
+                    <br>
+                    <input type="date" name="borrowing_date" placeholder="YYYY-MM-DD" required><br><br>
+                    
+                    Return Date:
+                    <br>
+                    <input type="date" name="return_date" placeholder="YYYY-MM-DD" value=""><br><br>
+
+                    Days Late:
+                    <br>
+                    <input type="number" name="days_late" placeholder="Days late" value=""><br><br>
+
+                    <input class="submit-button" type="submit" value="Save data">
+                </form>
+            </div>
+        </div>
+</body>
+</html>

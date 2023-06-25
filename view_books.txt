@@ -1,0 +1,73 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+$stmt = $pdo->query("SELECT b.book_id, b.title, b.author, b.pub_year, b.book_qty, g.genre
+                    FROM books b
+                    INNER JOIN genres g ON b.book_id = g.book_id");
+$books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>View Data</title>
+        <link rel="stylesheet" href="view.css">
+    </head>
+<body>
+    <div class="main">
+        <div class="add">
+            <a class="add-button" href="book.php">+ Add Data</a>
+        </div>
+        <div class="nav-container">
+            <div class="nav">
+                <div class="up">
+                    <h1>Books Information</h1>
+                </div>
+                <div class="down">
+                    <a class="view-button" href="view_books.php">Books</a>
+                    <a class="view-button" href="view_member.php">Members</a>
+                    <a class="view-button" href="view_borrowed.php">Borrowings</a>
+                    <a class="update-button" href="view_penalty.php">Penalty</a>
+                </div>
+            </div>
+        </div>
+            <div class="content">
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Publication Year</th>
+                            <th>Genre</th>
+                            <th>Quantity</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <?php foreach ($books as $book): ?>
+                        <tr>
+                            <td><?php echo $book['title']; ?></td>
+                            <td><?php echo $book['author']; ?></td>
+                            <td><?php echo $book['pub_year']; ?></td>
+                            <td><?php echo $book['genre']; ?></td>
+                            <td><?php echo $book['book_qty']; ?></td>
+                            <td class="actions">
+                                <a href="update_books.php?edit_book_id=<?php echo $book['book_id']; ?>"><img src="update.png"></a>
+                                <a href="delete_books.php?book_id=<?php echo $book['book_id']; ?>" onclick="return confirm('Are you sure you want to delete this book?')"><img src="delete.png"></a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

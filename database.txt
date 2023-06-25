@@ -1,0 +1,62 @@
+CREATE DATABASE library;
+
+USE library;
+
+CREATE TABLE books (
+  book_id INT(10) AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255),
+  author VARCHAR(255),
+  pub_year VARCHAR(50),
+  book_qty INT(10)
+);
+
+ALTER TABLE books AUTO_INCREMENT = 32001;
+
+CREATE TABLE genres (
+  gen_id INT(10) AUTO_INCREMENT PRIMARY KEY,
+  genre VARCHAR(100),
+  book_id INT(10),
+  UNIQUE KEY unique_book_id_per_genre (gen_id, book_id),
+  FOREIGN KEY (book_id) REFERENCES books (book_id)
+);
+
+ALTER TABLE genres AUTO_INCREMENT = 1001;
+
+CREATE TABLE members (
+  member_id INT(20) AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  address VARCHAR(255),
+  phone BIGINT(20),
+  email VARCHAR(255)
+);
+
+ALTER TABLE members AUTO_INCREMENT = 20230000;
+
+CREATE TABLE borrowings (
+  borrowing_id INT(50) AUTO_INCREMENT PRIMARY KEY,
+  member_id INT(20),
+  borrowing_date DATE,
+  due_date DATE,
+  return_date DATE,
+  days_late INT(10),
+  FOREIGN KEY (member_id) REFERENCES members (member_id)
+);
+
+ALTER TABLE borrowings AUTO_INCREMENT = 103000;
+
+CREATE TABLE borrowed_books (
+  borrowing_id INT(50),
+  book_id INT(10),
+  bb_qty INT(5),
+  FOREIGN KEY (borrowing_id) REFERENCES borrowings (borrowing_id),
+  FOREIGN KEY (book_id) REFERENCES books (book_id)
+);
+
+CREATE TABLE penalties (
+  penalty_id INT(10) AUTO_INCREMENT PRIMARY KEY,
+  penalty_amount DECIMAL(10, 2),
+  recent_update DATE
+);
+
+ALTER TABLE penalties AUTO_INCREMENT = 903000;

@@ -1,0 +1,136 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #ecf8f9e4;
+}
+
+.main {
+    width: 95%;
+    height: 653px;
+    margin-left: 28px;
+    margin-bottom: 20px;
+}
+
+.add {
+    display: flex;
+    position: relative;
+    float: right;
+    width: 20%;
+    height: 50px;
+    margin-top: 30px;
+    justify-content: right;
+}
+
+.add-button {
+    background-color: #8a3b3b;
+    border-radius: 10px;
+    width: 125px;
+    height: 30px;
+    transition: .3s;
+}
+
+.add-button:hover {
+    background-color: #52504f;
+}
+
+.add a {
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    padding-top: 15px;
+    FONT-SIZE: 15px;
+    letter-spacing: 2px;
+}
+
+.nav-container {
+    background-color: #068DA9;
+    width: 95%;
+    height: 75px;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 86px;
+    border-radius: 6px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 50%;
+    height: 50px;
+    margin-left: 20px;
+}
+
+.up h1 {
+    color: white;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    margin-left: 20px;
+}
+
+.down {
+    padding-left: 20px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+    width: 63%;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    top: 17%;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-left: 35px;
+}
+
+input[type="text1"],
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+select[name="genre"],
+select[name="member_id"] {
+    font-family: 'Times New Roman', Times, serif;
+    width: 95%;
+    height: 40px;
+    padding: 0 13px;
+    font-size: 15px;
+    box-sizing: border-box;
+    margin-top: 7px;
+}
+
+
+
+.submit-button {
+    background-color: #8a3b3b;
+    width: 150px;
+    height: 45px;
+    color: white;
+    font-size: 15px;
+    font-weight: 550;
+    letter-spacing: 2px;
+    margin: 0 auto;
+    position: relative;
+    bottom: 10px;
+    left: 30px;
+    transform: translateX(-50%);
+    text-transform: uppercase;
+    transition: .3s;
+}
+
+.submit-button:hover {
+    background-color: #52504f;
+}
+

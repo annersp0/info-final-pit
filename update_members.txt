@@ -1,0 +1,101 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if (isset($_GET['edit_member_id'])) {
+    $edit_member_id = $_GET['edit_member_id'];
+
+    $query = "SELECT * FROM members WHERE members.member_id = :edit_member_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':edit_member_id', $edit_member_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $first_name = $row['first_name'];
+        $last_name = $row['last_name'];
+        $address = $row['address'];
+        $phone = $row['phone'];
+        $email = $row['email'];
+    } else {
+    }
+}
+
+if (isset($_POST['update'])) {
+    $new_firstName = $_POST['first_name'];
+    $new_lastName = $_POST['last_name'];
+    $new_address = $_POST['address'];
+    $new_phone = $_POST['phone'];
+    $new_email = $_POST['email'];
+
+    $update_query = "UPDATE members SET first_name = :new_first_name, last_name = :new_last_name, address = :new_address, phone = :new_phone, email = :new_email WHERE member_id = :edit_member_id";
+    $stmt = $pdo->prepare($update_query);
+    $stmt->bindParam(':new_first_name', $new_firstName, PDO::PARAM_STR);
+    $stmt->bindParam(':new_last_name', $new_lastName, PDO::PARAM_STR);
+    $stmt->bindParam(':new_address', $new_address, PDO::PARAM_STR);
+    $stmt->bindParam(':new_phone', $new_phone, PDO::PARAM_INT);
+    $stmt->bindParam(':new_email', $new_email, PDO::PARAM_STR);
+    $stmt->bindParam(':edit_member_id', $edit_member_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    echo "<p>Data updated successfully!</p>";
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Data</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="update_form.css">
+</head>
+<body>
+<div class="main">
+    <div class="add">
+        <a class="add-button" href="view_member.php">View List</a>
+    </div>
+        <div class="nav-container">
+            <div class="nav">
+                <div class="up">
+                    <h1>Update Member Details</h1>
+                </div>
+            </div>
+        </div>
+            <div class="content">
+                <form method="POST" action="">
+                    First Name:
+                    <br>
+                    <input type="text" name="first_name" value="<?php echo $first_name; ?>" required><br><br>
+
+                    Last Name:
+                    <br>
+                    <input type="text" name="last_name" value="<?php echo $last_name; ?>" required><br><br>
+
+                    Address:
+                    <br>
+                    <input type="text" name="address" value="<?php echo $address; ?>" required><br><br>
+
+                    Phone:
+                    <br>
+                    <input type="number" name="phone" value="<?php echo $phone; ?>" required><br><br>
+
+                    Email:
+                    <br>
+                    <input type="email" name="email" value="<?php echo $email; ?>" required><br><br>
+
+                    <input class="submit-button" type="submit" name="update" value="Save data">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

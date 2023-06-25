@@ -1,0 +1,76 @@
+<?php
+require 'config.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $firstname = $_POST['first_name'];
+    $lastname = $_POST['last_name'];
+    $address = $_POST['address'];
+    $phone = $_POST['phone'];
+    $email = $_POST['email'];
+
+    try {
+    $stmt = $conn->prepare("INSERT INTO members (first_name, last_name, address, phone, email) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$firstname, $lastname, $address, $phone, $email]);
+    echo "Data saved successfully!";
+    } catch(PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add Data</title><br><br>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="form.css">
+    </head>
+<body>
+    <div class="main">
+        <div class="add">
+            <a class="add-button" href="view_member.php">View List</a>       
+        </div>
+        <div class="nav-container">
+            <div class="nav">
+                <div class="up">
+                <h1>Library Membership</h1>
+            </div>
+                <div class="down">
+                    <a class="view-button" href="book.php">Books</a>
+                    <a class="view-button" href="member.php">Members</a>
+                    <a class="view-button" href="borrowed.php">Borrowings</a>
+                    <a class="view-button" href="penalty.php">Penalty</a>
+                </div>   
+            </div>
+        </div>
+            <div class="content">
+                <form method="POST" action="">
+                    Last Name:
+                    <br>
+                    <input class="name" type="text1" name="last_name" placeholder="Last name" required><br><br>
+                
+                    First Name
+                    <br>
+                    <input class="name" type="text1" name="first_name" placeholder="First name" required><br><br>
+
+                    </section>
+                    
+                    Address:
+                    <br>
+                    <input type="text" name="address" placeholder="Address" required><br><br>
+                    
+                    Phone:
+                    <br>
+                    <input type="number" name="phone" placeholder="Phone number" required><br><br>
+                    
+                    Email:
+                    <br>
+                    <input type="email" name="email" placeholder="Email address" required><br><br><br>
+                    
+                    <input class="submit-button" type="submit" value="Save data">
+                </form>
+            </div>
+        </div>
+</body>
+</html>

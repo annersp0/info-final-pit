@@ -1,0 +1,106 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['title'])) {
+        $title = $_POST['title'];
+    } else {
+        $title = ""; 
+    }
+    $author = $_POST['author'];
+    $pub_year = $_POST['pub_year'];
+    $genre = $_POST['genre'];
+    $book_qty = $_POST['book_qty'];
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO books (title, author, pub_year, book_qty) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$title, $author, $pub_year, $book_qty]);
+
+        $book_id = $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO genres (genre, book_id) VALUES (?, ?)");
+        $stmt->execute([$genre, $book_id]);
+
+        $genre_id = $pdo->lastInsertId();
+
+        echo "<p>Book added successfully! Book ID: $book_id</p>";
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Add data</title><br><br>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="form.css">
+    </head>
+<body>
+    <div class="main">
+        <div class="add">
+            <a class="add-button" href="view_books.php">View List</a>       
+        </div>
+        <div class="nav-container">
+            <div class="nav">
+                <div class="up">
+                    <h1>Register Books</h1>
+                </div>
+                <div class="down">
+                    <a class="view-button" href="book.php">Books</a>
+                    <a class="view-button" href="member.php">Members</a>
+                    <a class="view-button" href="borrowed.php">Borrowings</a>
+                    <a class="view-button" href="penalty.php">Penalty</a>
+                </div>            
+            </div>
+        </div>
+            <div class="content">
+                <form method="POST" action="">
+                    Title:
+                    <br>
+                    <input type="text" name="title" placeholder="Book title" required><br><br>
+                
+                    Author:
+                    <br>
+                    <input type="text" name="author" placeholder="Book author" required><br><br>
+                    
+                    Publication Year:
+                    <br>
+                    <input type="number" name="pub_year" placeholder="YYYY" required><br><br>
+                    
+                    Genre:
+                    <br>
+                    <select name="genre" id="genre">
+                        <option value="Education">Educational</option>
+                        <option value="Fiction">Fiction</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Thriller">Thriller</option>
+                    </select><br><br>
+
+                    Quantity:
+                    <br>
+                    <input type="text" name="book_qty" placeholder="Book quantity" required><br><br><br>
+                    
+                    <input class="submit-button" type="submit" value="Save data">
+                </form>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,115 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+$stmt = $pdo->query("SELECT b.borrowing_id, m.first_name, m.last_name, books.title, bb.bb_qty, b.borrowing_date, b.due_date, b.return_date, b.days_late, p.penalty_amount
+                    FROM borrowings b
+                    INNER JOIN borrowed_books bb ON b.borrowing_id = bb.borrowing_id
+                    INNER JOIN books ON bb.book_id = books.book_id
+                    INNER JOIN members m ON b.member_id = m.member_id
+                    LEFT JOIN penalties p ON p.penalty_id = p.penalty_id");
+
+
+$records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$groupedRecords = [];
+foreach ($records as $record) {
+    $borrowingID = $record['borrowing_id'];
+    if (!isset($groupedRecords[$borrowingID])) {
+        $groupedRecords[$borrowingID] = [
+            'borrowing_id' => $borrowingID,
+            'member_name' => $record['first_name'] . ' ' . $record['last_name'],
+            'borrowing_date' => $record['borrowing_date'],
+            'due_date' => $record['due_date'],
+            'return_date' => $record['return_date'],
+            'days_late' => $record['days_late'],
+            'penalty_amount' => $record['penalty_amount'],
+            'books' => []
+        ];
+    }
+
+    $groupedRecords[$borrowingID]['books'][] = [
+        'title' => $record['title'],
+        'bb_qty' => $record['bb_qty']
+    ];
+}
+?>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>View Data</title>
+        <link rel="stylesheet" href="view.css">
+    </head>
+<body>
+    <div class="main">
+        <div class="add">
+            <a class="add-button" href="borrowed.php">+ Add Data</a>
+        </div>
+        <div class="nav-container">
+            <div class="nav">
+                <div class="up">
+                    <h1>Checked-out Books</h1>
+                </div>
+                <div class="down">
+                    <a class="view-button" href="view_books.php">Books</a>
+                    <a class="view-button" href="view_member.php">Members</a>
+                    <a class="view-button" href="view_borrowed.php">Borrowings</a>
+                    <a class="update-button" href="view_penalty.php">Penalty</a>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th>Member Name</th>
+                        <th>Book Title</th>
+                        <th>Quantity</th>
+                        <th>Borrowed Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Days Late</th>
+                        <th>Penalty Amount</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <?php foreach ($groupedRecords as $record): ?>
+                    <?php $bookCount = count($record['books']); ?>
+                    <?php foreach ($record['books'] as $index => $book): ?>
+                        <tr>
+                            <?php if ($index === 0): ?>
+                                <td rowspan="<?php echo $bookCount; ?>"><?php echo $record['member_name']; ?></td>
+                            <?php endif; ?>
+                            <td><?php echo $book['title']; ?></td>
+                            <td><?php echo $book['bb_qty']; ?></td>
+                            <?php if ($index === 0): ?>
+                                <td rowspan="<?php echo $bookCount; ?>"><?php echo $record['borrowing_date']; ?></td>
+                                <td rowspan="<?php echo $bookCount; ?>"><?php echo $record['due_date']; ?></td>
+                                <td rowspan="<?php echo $bookCount; ?>"><?php echo $record['return_date']; ?></td>
+                                <td rowspan="<?php echo $bookCount; ?>"><?php echo $record['days_late']; ?></td>
+                                <td rowspan="<?php echo $bookCount; ?>">
+                                <?php echo $record['penalty_amount'] !== null ? ($record['days_late'] * $record['penalty_amount']) : strtoupper('null'); ?>
+                            </td>
+                                <td rowspan="<?php echo $bookCount; ?>" class="actions">
+                                    <a href="update_borrowed.php?edit_borrowing_id=<?php echo $record['borrowing_id']; ?>"><img src="update.png"></a>
+                                    <a href="delete_borrowed.php?borrowing_id=<?php echo $record['borrowing_id']; ?>" onclick="return confirm('Are you sure you want to delete this record?')"><img src="delete.png"></a>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

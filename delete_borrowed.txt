@@ -1,0 +1,31 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if (isset($_GET['borrowing_id'])) {
+    $borrowing_id = $_GET['borrowing_id'];
+
+    $delete_borrowed_books_query = "DELETE FROM borrowed_books WHERE borrowing_id = :borrowing_id";
+    $stmt = $pdo->prepare($delete_borrowed_books_query);
+    $stmt->bindParam(':borrowing_id', $borrowing_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $delete_borrowings_query = "DELETE FROM borrowings WHERE borrowing_id = :borrowing_id";
+    $stmt = $pdo->prepare($delete_borrowings_query);
+    $stmt->bindParam(':borrowing_id', $borrowing_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    header("Location: view_borrowed.php");
+    exit();
+} else {
+}
+?>

@@ -1,0 +1,170 @@
+<?php
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "library";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+if (isset($_GET['edit_borrowing_id'])) {
+    $edit_borrowing_id = $_GET['edit_borrowing_id'];
+
+    $query = "SELECT borrowings.*, borrowed_books.* FROM borrowings LEFT JOIN borrowed_books ON borrowings.borrowing_id = borrowed_books.borrowing_id WHERE borrowings.borrowing_id = :edit_borrowing_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':edit_borrowing_id', $edit_borrowing_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $borrowingID = $row['borrowing_id'];
+        $memberID = $row['member_id'];
+        $bookID = $row['book_id'];
+        $bbQty = $row['bb_qty'];
+        $borrowingDate = $row['borrowing_date'];
+        $dueDate = $row['due_date'];
+        $returnDate = $row['return_date'];
+        $daysLate = $row['days_late'];
+        $borrowedBooks = array();
+        do {
+            $borrowedBooks[] = array(
+                'book_id' => $row['book_id'],
+                'bb_qty' => $row['bb_qty']
+            );
+        } while ($row = $stmt->fetch(PDO::FETCH_ASSOC));
+    }
+}
+
+if (isset($_POST['update'])) {
+    $new_member_id = $_POST['member_id'];
+    $new_borrowing_date = $_POST['borrowing_date'];
+    $new_due_date = $_POST['due_date'];
+    $new_return_date = $_POST['return_date'];
+    $new_days_late = $_POST['days_late'];
+
+    $update_borrowings_query = "UPDATE borrowings SET member_id = :new_member_id, borrowing_date = :new_borrowing_date, due_date = :new_due_date, return_date = :new_return_date, days_late = :new_days_late WHERE borrowing_id = :edit_borrowing_id";
+    $stmt = $pdo->prepare($update_borrowings_query);
+    $stmt->bindParam(':new_member_id', $new_member_id, PDO::PARAM_INT);
+    $stmt->bindParam(':new_borrowing_date', $new_borrowing_date, PDO::PARAM_STR);
+    $stmt->bindParam(':new_due_date', $new_due_date, PDO::PARAM_STR);
+    $stmt->bindParam(':new_return_date', $new_return_date, PDO::PARAM_STR);
+    $stmt->bindParam(':new_days_late', $new_days_late, PDO::PARAM_STR);
+    $stmt->bindParam(':edit_borrowing_id', $edit_borrowing_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    foreach ($_POST['book_id'] as $index => $bookID) {
+        $bbQty = $_POST['bb_qty'][$index];
+
+        $update_borrowed_books_query = "UPDATE borrowed_books SET book_id = :book_id, bb_qty = :bb_qty WHERE borrowing_id = :edit_borrowing_id AND book_id = :old_book_id";
+        $stmt = $pdo->prepare($update_borrowed_books_query);
+        $stmt->bindParam(':book_id', $bookID, PDO::PARAM_INT);
+        $stmt->bindParam(':bb_qty', $bbQty, PDO::PARAM_INT);
+        $stmt->bindParam(':edit_borrowing_id', $edit_borrowing_id, PDO::PARAM_INT);
+        $stmt->bindParam(':old_book_id', $borrowedBooks[$index]['book_id'], PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    echo "<p>Data updated successfully!</p>";
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Data</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="update_form.css">
+</head>
+<body>
+<div class="main">
+    <div class="add">
+        <a class="add-button" href="view_borrowed.php">View List</a>
+    </div>
+    <div class="nav-container">
+        <div class="nav">
+            <div class="up">
+                <h1>Update Borrowings</h1>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <form method="POST" action="">
+            Member:
+            <br>
+            <select name="member_id">
+                <?php
+                $stmt = $pdo->query("SELECT member_id, CONCAT(first_name, ' ', last_name) AS full_name FROM members");
+                $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($members as $member) {
+                    $selected = ($member['member_id'] == $memberID) ? 'selected' : '';
+                    echo "<option value='" . $member['member_id'] . "' $selected>" . $member['full_name'] . "</option>";
+                }
+                ?>
+            </select>
+            <br><br>
+
+            <?php
+            $stmt = $pdo->query("SELECT book_id, title, book_qty FROM books");
+            $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            for ($i = 0; $i < count($borrowedBooks); $i++) {
+                $bookID = $borrowedBooks[$i]['book_id'];
+                $bbQty = $borrowedBooks[$i]['bb_qty'];
+                ?>
+
+                Book <?php echo $i + 1; ?>:
+                <br>
+                <select name="book_id[]" 
+                    style="font-family: 'Times New Roman', Times, serif;
+                        width: 95%;
+                        height: 40px;
+                        padding: 0 13px;
+                        font-size: 15px;
+                        box-sizing: border-box;
+                        margin-top: 7px;
+                    }">
+                    
+                    <?php
+                    foreach ($books as $book) {
+                        $selected = ($book['book_id'] == $bookID) ? 'selected' : '';
+                        echo "<option value='" . $book['book_id'] . "' $selected>" . $book['title'] . "</option>";
+                    }
+                    ?>
+                </select>
+                <br><br>
+
+                Quantity <?php echo $i + 1; ?>:
+                <br>
+                <input type="text" name="bb_qty[]" value="<?php echo $bbQty; ?>"><br><br>
+
+                <?php
+            }
+            ?>
+
+            Borrowing Date:
+            <br>
+            <input type="date" name="borrowing_date" value="<?php echo $borrowingDate; ?>"><br><br>
+
+            Due Date:
+            <br>
+            <input type="date" name="due_date" value="<?php echo $dueDate; ?>"><br><br>
+
+            Return Date:
+            <br>
+            <input type="date" name="return_date" value="<?php echo $returnDate; ?>"><br><br>
+
+            Days Late:
+            <br>
+            <input type="number" name="days_late" value="<?php echo $daysLate; ?>"><br><br>
+
+            <input class="submit-button" type="submit" name="update" value="Save data">
+        </form>
+    </div>
+</div>
+</body>
+</html>
